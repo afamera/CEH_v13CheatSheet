@@ -369,6 +369,9 @@ hashcat -a 0 -m 0 <hashes> [wordlist, rule, mask, ...]                        # 
 hashcat -a 3 -m 0 [HASH] '?u?l?l?l?l?d?s'                                     # Mask attack
 hashcat -a 0 -m 0 [HASH] rockyou.txt -r /usr/share/hashcat/rules/best64.rule  # Use a ruleset
 ls -l /usr/share/hashcat/rules                                                # List available rules
+
+echo "e5d8870e5bdd26602cab8dbe07a942c8669e56d6:tryhackme" > hash.txt          # Taking into account salting
+hashcat -a 0 -m 110 hash.txt /usr/share/wordlists/rockyou.txt
 ```
 
 #### Common Hash Types
