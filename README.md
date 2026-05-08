@@ -610,3 +610,72 @@ Enter-PSSession -ComputerName DC01
 | Ports | TCP 5985 (HTTP) / 5986 (HTTPS) for WinRM/PSRemoting |
 
 
+## Wireshark
+
+### Display Filters 
+```
+# IP Filters
+ip.addr == 192.168.1.1          # Filter any traffic to/from IP
+ip.src == 192.168.1.1           # Filter source IP
+ip.dst == 192.168.1.1           # Filter destination IP
+ip.addr == 192.168.1.0/24       # Filter entire subnet
+!(ip.addr == 192.168.1.1)       # Exclude IP
+
+# Protocol Filters
+http
+https
+ftp
+
+# Port Filters
+tcp.port == 80                  # TCP port
+udp.port == 53                  # UDP port
+
+# Packet/Frame Filters
+frame.number == 500             # Specific frame number
+frame.len >= 1000               # Frame length greater than 1000 bytes
+frame.time_delta > 1            # Time delta between frames
+
+# TCP Filters
+tcp.flags.syn == 1              # SYN packets
+tcp.flags.ack == 1              # ACK packets
+tcp.flags.reset == 1            # RST packets (connection resets)
+tcp.flags.fin == 1              # FIN packets
+
+# HTTP Filters
+http.request                    # HTTP requests only
+http.response                   # HTTP responses only
+http.request.method == "GET"    # GET requests
+http.request.method == "POST"   # POST requests, catch form submissions
+http.response.code == 200       # HTTP 200 OK
+http.response.code == 404       # HTTP 404 Not Found
+http.response.code == 401       # HTTP 401 Unauthorized
+http.host == "example.com"      # Filter by host header
+http.request.uri contains "login"  # URI contains string
+```
+
+### OSI Layer Reference in Wireshark
+| Layer | Wireshark Section | Shows |
+|-------|------------------|-------|
+| Layer 1 - Physical | Frame | Frame number, size, timing |
+| Layer 2 - Data Link | Ethernet | Source/destination MAC |
+| Layer 3 - Network | Internet Protocol | Source/destination IP |
+| Layer 4 - Transport | TCP/UDP | Ports, flags, sequence numbers |
+| Layer 5-7 - Application | HTTP/FTP/SMB etc | Protocol specific data |
+
+### Useful Menu Actions
+| Action | Location |
+|--------|----------|
+| File properties / pcap info | Statistics → Capture File Properties |
+| Find packet | Edit → Find Packet |
+| Mark/unmark packet | Right-click → Mark/Unmark |
+| Apply field as filter | Right-click → Apply as Filter |
+| Filter conversation | Analyse → Conversation Filter |
+| Follow TCP stream | Analyse → Follow → TCP Stream |
+| Follow UDP stream | Analyse → Follow → UDP Stream |
+| Follow HTTP stream | Analyse → Follow → HTTP Stream |
+| Go to specific packet | Go → Go to Packet |
+| Protocol hierarchy | Statistics → Protocol Hierarchy |
+| Conversations | Statistics → Conversations |
+| Endpoints | Statistics → Endpoints |
+| IO Graph | Statistics → IO Graph |
+| Export HTTP objects | File → Export Objects → HTTP |
