@@ -236,9 +236,15 @@ nmap -p 25 --script=smtp-commands [IP]       # List SMTP commands
 ### SMB Enumeration
 ```bash
 nmap -p 445 -A                           # SMB OS banner grab + info
-nmap -p 139,445 --script smb-enum-shares 
+nmap -p 139,445 --script smb-enum-shares # this one is cool
 nmap -p 139,445 --script smb-enum-users 
 nmap -p 445 --script smb-vuln*           # SMB vulnerability scan
+
+# smbmap
+smbmap -H [IP]                           # similar to smb-enum-shares
+
+# Accessing smb
+smbclient //[IP]/[SHARE]
 ```
 
 ---
