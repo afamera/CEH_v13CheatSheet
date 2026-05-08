@@ -685,3 +685,47 @@ http.request.uri contains "login"  # URI contains string
 | Endpoints | Statistics → Endpoints |
 | IO Graph | Statistics → IO Graph |
 | Export HTTP objects | File → Export Objects → HTTP |
+
+## WPScan
+```
+# Basic Scanning
+wpscan --url http://[HOST or IP]                           # Basic scan
+wpscan --url http://[HOST or IP]  --disable-tls-checks     # Ignore SSL errors
+wpscan --url http://[HOST or IP]  -v                       # Verbose output
+
+# Enumerate Users
+wpscan --url http://[HOST or IP] --enumerate u
+
+# Password Attacks
+wpscan --url http:// -U admin -P rockyou.txt                             # Single user
+wpscan --url http:// -U user1,user2 -P rockyou.txt                       # Multiple Users
+wpscan --url http:// -U admin -P rockyou.txt --password-attack wp-login  # Specify attack method
+wpscan --url http:// -U admin -P rockyou.txt --password-attack xmlrpc    # Specify attack method
+
+wpscan --url http:// --detection-mode passive    # Passive only (stealthy)
+wpscan --url http:// --detection-mode aggressive # Aggressive (more results)
+wpscan --url http:// --detection-mode mixed      # Both (default)
+```
+
+### WordPress Attack Flow
+```bash
+# Step 1 — Basic recon
+wpscan --url http://
+
+# Step 2 — Enumerate users and plugins aggressively
+wpscan --url http:// --enumerate u,ap,at --detection-mode aggressive
+
+# Step 3 — Brute force discovered users
+wpscan --url http:// -U  -P /usr/share/wordlists/rockyou.txt --password-attack wp-login -t 64
+```
+
+### Key Things WPScan Finds
+| Finding | What It Means |
+|---------|--------------|
+| WordPress version | Check for known CVEs |
+| XML-RPC enabled | Allows brute force via xmlrpc.php — harder to block |
+| Upload dir listing | May expose uploaded files/shells |
+| robots.txt entries | Reveals hidden paths like /wp-admin/ |
+| Outdated plugins | Most common WordPress attack vector |
+| Config backups | May contain DB credentials |
+| Users identified | Targets for password attack |
