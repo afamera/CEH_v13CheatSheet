@@ -729,3 +729,193 @@ wpscan --url http:// -U  -P /usr/share/wordlists/rockyou.txt --password-attack w
 | Outdated plugins | Most common WordPress attack vector |
 | Config backups | May contain DB credentials |
 | Users identified | Targets for password attack |
+
+## Steganography & Cryptography Cheat Sheet
+
+---
+
+### SNOW / StegSnow (Whitespace Steganography)
+Hides data in whitespace characters (tabs/spaces) at end of lines in text files.
+
+**Commands (use `stegsnow` on Kali, `snow` on Windows):**
+```bash
+# Hide message in a text file
+stegsnow -C -m "secret message" -p "password" input.txt output.txt
+
+# Extract hidden message
+stegsnow -C -p "password" output.txt
+
+# Hide without password
+stegsnow -C -m "secret message" input.txt output.txt
+
+# Extract without password
+stegsnow -C output.txt
+```
+
+#### Key Flags
+| Flag | Description |
+|------|-------------|
+| `-C` | Compress data before hiding |
+| `-m` | Message to hide |
+| `-p` | Password for encryption |
+| `-l` | Line length limit |
+
+---
+
+### OpenStego (Image Steganography)
+Hides data inside image files (PNG, BMP, JPG).
+
+**Launch:**
+```bash
+java -jar ~/Downloads/openstego-0.8.6.jar
+```
+
+**Embed (Hide data in image):**
+1. Open OpenStego
+2. Select **Data Hiding** → **Hide Data** tab
+3. **Message File** → select file to hide
+4. **Cover File** → select carrier image (use PNG)
+5. **Output File** → set output image name
+6. Set password if desired
+7. Click **Embed Message**
+
+**Extract (Recover hidden data):**
+1. Select **Data Hiding** → **Extract Data** tab
+2. **Input File** → select steganographic image
+3. **Output Folder** → where to save extracted file
+4. Enter password if one was set
+5. Click **Extract Message**
+
+**Watermarking:**
+1. Select **Watermarking** → **Generate Signature** tab
+2. Load image and set watermark
+3. Click **Generate**
+4. To verify, use **Verify Watermark** tab
+
+**Key Notes:**
+| Item | Detail |
+|------|---------|
+| Best format | PNG — JPG compression destroys hidden data |
+| No password | Leave password blank if none was set |
+| Output file | Always specify a new filename, don't overwrite cover image |
+| File size | Output image will be slightly larger than cover image |
+
+---
+
+### CyberChef (Encoding/Decoding/Encryption)
+**Access:** https://gchq.github.io/CyberChef
+
+**How to Use:**
+1. Open CyberChef in browser
+2. **Input** box (top right) — paste your data
+3. **Operations** panel (left) — search and drag operations to Recipe
+4. **Recipe** panel (middle) — your chain of operations
+5. **Output** box (bottom right) — results appear automatically
+6. Click **Bake** to manually trigger if auto-bake is off
+
+#### Common Operations with Sample Values
+| Operation | Sample Input | Sample Output |
+|-----------|-------------|---------------|
+| From Base64 | `SGVsbG8gV29ybGQ=` | `Hello World` |
+| To Base64 | `Hello World` | `SGVsbG8gV29ybGQ=` |
+| From Hex | `48 65 6c 6c 6f` | `Hello` |
+| To Hex | `Hello` | `48 65 6c 6c 6f` |
+| ROT13 | `Uryyb Jbeyq` | `Hello World` |
+| MD5 | `Hello World` | `b10a8db164e0754105b7a99be72e3fe5` |
+| SHA1 | `Hello World` | `0a4d55a8d778e5022fab701977c5d840bbc486d0` |
+| SHA256 | `Hello World` | `a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e` |
+| From Binary | `01001000 01100101 01101100 01101100 01101111` | `Hello` |
+| URL Decode | `Hello%20World%21` | `Hello World!` |
+| From Charcode | `72 101 108 108 111` | `Hello` |
+| XOR (key=1) | `Hello` | `49 64 6d 6d 6e` |
+
+**Magic Operation (Auto-detect):**
+1. Search "Magic" → drag to Recipe
+2. Paste unknown encoded string in Input
+3. Increase **Intensity** slider for deeper analysis
+4. CyberChef will suggest encoding type and decoded result
+
+---
+
+### VeraCrypt (Full Disk / Volume Encryption)
+
+**Create Encrypted Volume (GUI):**
+1. Open VeraCrypt → **Create Volume**
+2. Select **Create an encrypted file container**
+3. Choose **Standard VeraCrypt volume**
+4. Set file location and name
+5. Choose encryption algorithm (AES default)
+6. Set volume size
+7. Set strong password
+8. Move mouse randomly to generate entropy → **Format**
+
+**Mount Volume (GUI):**
+1. Select a drive slot
+2. Click **Select File** → choose container
+3. Click **Mount** → enter password
+4. Use mounted drive normally
+5. Click **Dismount** when done
+
+**Hidden Volume:**
+1. During creation select **Hidden VeraCrypt volume**
+2. Creates two volumes with two passwords
+3. Outer volume for plausible deniability
+4. Inner hidden volume contains real data
+
+#### Encryption Algorithms
+| Algorithm | Notes |
+|-----------|-------|
+| AES | Default, fastest |
+| Serpent | Slower, more secure |
+| Twofish | Good alternative |
+| AES-Twofish-Serpent | Cascaded, most secure, slowest |
+
+---
+
+### CryptoForge (File Encryption)
+
+**GUI Workflow — Encrypt:**
+1. Right-click file → **Encrypt**
+2. Enter passphrase
+3. File saved as `.cfe` extension
+
+**GUI Workflow — Decrypt:**
+1. Right-click `.cfe` file → **Decrypt**
+2. Enter passphrase
+3. Original file restored
+
+**CLI:**
+```bash
+# Encrypt file
+cryptoforge encrypt -p "password" file.txt
+
+# Decrypt file
+cryptoforge decrypt -p "password" file.txt.cfe
+
+# Shred (securely delete)
+cryptoforge shred file.txt
+```
+
+#### Key Features
+| Feature | Description |
+|---------|-------------|
+| Algorithms | Blowfish, Triple DES, CAST, 3DES |
+| File shredding | Secure deletion of originals |
+| Text encryption | Encrypt clipboard text |
+| `.cfe` extension | CryptoForge encrypted file format |
+
+---
+
+### Quick Reference — Which Tool for What
+| Scenario | Tool |
+|----------|------|
+| Hide text in whitespace of .txt file | SNOW/StegSnow |
+| Hide file inside an image | OpenStego |
+| Decode Base64/Hex/ROT13 quickly | CyberChef |
+| Encrypt entire drive or create encrypted container | VeraCrypt |
+| Encrypt individual files with passphrase | CryptoForge |
+| Watermark an image | OpenStego |
+| Plausible deniability encryption | VeraCrypt hidden volume |
+| Auto-detect unknown encoding | CyberChef Magic |
+
+
