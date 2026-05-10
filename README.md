@@ -19,6 +19,10 @@ nmap -sn -PO [IP]                                   # IP Protocol ping
 nmap -6sn -PA [IP]                                  # IPv6 ping
 nmap -sn -PE --reason [IP]                          # Show why host marked alive
 nmap -sn -PE --packet-trace --disable-arp-ping [IP] # Trace packets, no ARP
+
+# Save them to a file:
+nmap -sn -PE [SUBNET] -oG - | grep "Up" | awk '{print $2}' > live_hosts.txt
+nmap -sV -sC -F -iL live_hosts.txt > scan.txt
 ```
 
 ---
