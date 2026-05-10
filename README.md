@@ -151,9 +151,10 @@ enum4linux-ng -A [IP]        # Alternative full enumeration
 
 ### SNMP Enumeration
 ```bash
-snmpwalk -v1 -c public [IP]                   # SNMP v1 walk
-snmpwalk -v2c -c public [IP]                  # SNMP v2c walk
-nmap -sU -p 161 --script=snmp-processes [IP]  # SNMP via Nmap
+snmpwalk -v1 -c public [IP]                                                            # SNMP v1 walk
+snmpwalk -v2c -c public [IP]                                                           # SNMP v2c walk
+snmpwalk -v3 -u [username] -l authPriv -a MD5 -A [authpass] -x DES -X [privpass] [IP]  # SNMP v3 (requires credentials)
+nmap -sU -p 161 --script=snmp-processes [IP]                                           # SNMP via Nmap
 ```
 ---
 
@@ -167,8 +168,8 @@ nmap -p 389 --script ldap-brute --script-args ldap.base='"cn=users,dc=CEH,dc=com
 ### NFS Enumeration
 ```bash
 nmap -p 2049 [IP]                   # Check NFS port
-showmount -e [IP]                   # Show exported directories
-rpcinfo -p   [IP]                   # RPC info
+showmount -e [IP]                   # Show Available NFS Shares
+rpcinfo -p [IP]                     # RPC info
 ```
 
 **SuperEnum:**
@@ -190,8 +191,8 @@ rpcinfo -p   [IP]                   # RPC info
 
 **Nmap DNS**
 ```
-nmap --script=broadcast-dns-service-discovery 
-nmap -sU -p 53 --script dns-nsec-enum --script-args dns-nsec-enum.domains=
+nmap --script=broadcast-dns-service-discovery [IP]
+nmap -sU -p 53 --script dns-nsec-enum --script-args dns-nsec-enum.domains= [IP]
 ```
 
 **Zone Transfer (Linux)**
