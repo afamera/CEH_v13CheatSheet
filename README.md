@@ -133,11 +133,19 @@ hping3 -S  -p 80 --tcp-timestamp [IP]       # Firewall timestamp
 
 ### NetBIOS Enumeration
 ```bash
-nbtstat -a [IP]        # NetBIOS name table of remote machine
-nbtstat -c [IP]        # NetBIOS name cache + resolved IPs
-net use                # Connection status, shared folders, network info
-net view \\            # List shared resources on remote host
-net view /domain:      # List shares by domain
+# Windows Workflow
+nbtstat -a [IP]              # NetBIOS name table of remote machine
+nbtstat -c [IP]              # NetBIOS name cache + resolved IPs
+net use                      # Connection status, shared folders, network info 
+net view \\[HOST]            # List shared resources on remote host 
+net view /domain:[DOMAIN]    # List shares by domain
+
+# Kali/Linux Workflow
+nmblookup -A [IP]            # NetBIOS name table (nbtstat -a equivalent)
+nbtscan [IP]                 # NetBIOS name cache (nbtstat -c equivalent)
+smbclient -L //[IP] -N       # List shares (net use / net view equivalent)
+enum4linux -a [IP]           # Full enumeration including domain info
+enum4linux-ng -A [IP]        # Alternative full enumeration
 ```
 ---
 
