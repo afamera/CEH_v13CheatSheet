@@ -629,6 +629,152 @@ Enter-PSSession -ComputerName DC01
 | Ports | TCP 5985 (HTTP) / 5986 (HTTPS) for WinRM/PSRemoting |
 
 
+## Burp Suite & ZAP Cheat Sheet
+
+---
+
+## Web App/Server Exploitation
+
+### Burp Suite
+
+#### Keyboard Shortcuts
+| Shortcut | Action |
+|----------|--------|
+| `CTRL+R` | Send to Repeater |
+| `CTRL+SHIFT+R` | Go to Repeater |
+| `CTRL+I` | Send to Intruder |
+| `CTRL+SHIFT+I` | Go to Intruder |
+| `CTRL+U` | URL Encode |
+| `CTRL+SHIFT+U` | URL Decode |
+
+#### Default Settings
+```
+IP:   127.0.0.1
+Port: 8080
+```
+
+#### Intercepting Requests
+```
+Proxy → Intercept (Toggle On)
+```
+
+#### Intercepting Responses
+```
+Proxy → Proxy Settings → Response Interception Rules → Enable Intercept Response
+```
+
+#### Automatic Request/Response Modification
+```
+Proxy → Proxy Settings → HTTP Match and Replace Rules → Add
+```
+- Check **Regex Match** if using regex
+- Regex format: `^[text].*$`
+
+#### Repeating Requests
+```
+Proxy → HTTP History → right-click request → Send to Repeater → Send
+```
+
+#### Setting Proxy in Metasploit
+```bash
+set PROXIES HTTP:127.0.0.1:8080
+```
+
+#### Intruder (Fuzzing)
+```
+Proxy History → right-click → Send to Intruder
+```
+
+**Positions tab:**
+- Highlight target text → click **Add §** to mark injection point
+
+**Payloads tab:**
+| Payload Type | Description |
+|--------------|-------------|
+| Simple List | Basic wordlist — iterates each line |
+| Runtime File | Loads line by line — saves memory |
+| Character Substitution | Replaces characters with defined substitutions |
+
+**Settings tab:**
+- **Grep - Match** → Clear → type `200 OK` → Add (flags successful responses)
+- Disable **Exclude HTTP Headers**
+
+**Payload Processing:**
+- Skip lines starting with `.` → Add → Skip if matches regex → `^\..*$`
+
+---
+
+### ZAP (OWASP)
+
+#### Keyboard Shortcuts
+| Shortcut | Action |
+|----------|--------|
+| `CTRL+B` | Toggle intercept on/off |
+| `CTRL+R` | Go to Replacer |
+| `CTRL+E` | Go to Encode/Decode/Hash |
+
+#### Default Settings
+```
+IP:   127.0.0.1
+Port: 8080
+```
+
+#### Intercepting Requests
+```
+Toggle green button ON → use Step to forward requests
+```
+- **Step** — send request and examine response
+- **Continue** — let page send all remaining requests
+- Enable **HUD** to work directly in browser
+
+#### Intercepting Responses
+```
+Automatic — visible in HUD after pressing Step
+```
+
+#### Automatic Request/Response Modification
+```
+Use Replacer (CTRL+R)
+```
+
+#### Repeating Requests
+```
+History pane → right-click request → Open/Resend with Request Editor → Send
+```
+- **Replay in Console** — response in HUD window
+- **Replay in Browser** — response rendered in browser
+
+#### Setting Proxy in Metasploit
+```bash
+set PROXIES HTTP:127.0.0.1:8080
+```
+
+#### ZAP Fuzzer
+```
+History pane → right-click → Attack → Fuzz
+```
+1. Highlight target word → click **Add**
+2. Add payload/wordlist → select Type
+
+| Payload Type | Description |
+|--------------|-------------|
+| File | Load wordlist from file |
+| File Fuzzers | Built-in wordlist databases |
+| Numberzz | Generate number sequences with custom increments |
+
+- **Processors** — encode/transform payloads
+- **Options** — change thread count, depth/breadth first search
+- Click **Start Fuzzer** to begin
+
+#### ZAP Scanner
+```
+Attack → Spider → crawls site (passive scan)
+```
+1. View **Sites Tree** in left pane
+2. Once populated → begin **Active Scan**
+
+---
+
 ## Wireshark
 
 ### Display Filters 
