@@ -932,3 +932,102 @@ cryptoforge shred file.txt
 | Auto-detect unknown encoding | CyberChef Magic |
 
 
+## Mobile Hacking
+---
+
+### ADB (Android Debug Bridge)
+
+#### Connection
+```powershell
+# Use in powershell Windows
+adb devices                          # verify device/emulator connected
+adb connect [IP]:[PORT]              # connect to remote device
+adb connect [IP]:5555                # default ADB port
+adb kill-server && adb start-server  # restart ADB if not connecting
+```
+
+#### Shell Access
+```powershell
+adb shell                            # open interactive shell
+adb root                             # restart ADB as root
+adb shell su                         # switch to root in shell
+```
+
+#### Package Enumeration
+```powershell
+adb shell pm list packages           # all packages
+adb shell pm list packages -3        # third party only
+adb shell pm list packages -3 -f     # third party with file paths
+adb shell pm list packages -s        # system packages only
+adb install <path.apk>               # install APK
+adb uninstall [PACKAGE]              # uninstall app
+```
+
+#### Device Information
+```powershell
+adb shell getprop ro.product.model           # device model
+adb shell getprop ro.build.version.release   # Android version
+adb shell getprop ro.build.version.sdk       # SDK version
+adb shell getprop ro.product.manufacturer    # manufacturer
+adb shell getprop ro.serialno                # serial number
+adb shell which su                           # check if rooted
+```
+
+#### Forensics
+```powershell
+adb shell dumpsys battery                              # battery info
+adb shell dumpsys package [PACKAGE]                    # app info
+adb shell ps -A                                        # running processes
+adb shell netstat                                      # network connections
+adb shell content query --uri content://sms/           # SMS messages
+adb shell content query --uri content://call_log/calls # call logs
+adb logcat -d > logcat.txt                             # dump system logs
+adb shell screencap /sdcard/screen.png                 # screenshot
+adb pull /sdcard/screen.png                            # pull to local
+adb shell lsof -p <pid>                                # List open files for process
+```
+
+#### File Transfer
+```powershell
+adb pull /sdcard/file.txt            # pull file from device
+adb pull /sdcard/                    # pull entire sdcard
+adb push file.txt /sdcard/           # push file to device
+adb shell cat /sdcard/file.txt       # read file on device
+```
+
+---
+
+### PhoneSploit Pro
+Exploits Android devices with ADB TCP debugging enabled on port 5555.
+
+#### Usage
+```bash
+# Launch PhoneSploit
+python3 phonesploitpro.py
+
+# When prompted enter target IP
+# PhoneSploit connects via ADB port 5555 automatically
+```
+
+#### PhoneSploit Menu Options (Key ones for CEH)
+| Option | Action |
+|--------|--------|
+| 1 | Connect to device |
+| 2 | Access device shell |
+| 3 | List installed apps |
+| 4 | Screenshot device screen |
+| 5 | Download file from device |
+| 6 | Send SMS |
+| 7 | Show device info |
+| 8 | Show running apps |
+| 9 | Show call logs |
+| 10 | Show contacts |
+| 11 | Show SMS messages |
+| 12 | Install APK |
+
+#### Requirements for PhoneSploit to Work
+- Target device must have **USB Debugging enabled**
+- Target device must have **ADB over TCP enabled** on port 5555
+- Attacker and target on same network OR target IP reachable
+
+---
