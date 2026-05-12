@@ -7,10 +7,10 @@
 
 ### Host Discovery
 ```bash
-nmap -sn -PE [IP]                                    # ICMP Echo ping
+nmap -sn -PE [IP]                                    # ICMP Echo ping (good host discovery)
 nmap -sn -PE [IP RANGE]                              # ICMP Echo sweep
 nmap -sn -PP [IP]                                    # ICMP Timestamp ping
-nmap -sn -PM [IP]                                    # ICMP Address Mask ping
+nmap -sn -PM [IP]                                    # ICMP Address Mask ping (used when administrators block the ICMP ECHO pings)
 nmap -sn -PR [IP]                                    # ARP ping
 nmap -sn -PU [IP]                                    # UDP ping
 nmap -sn -PS [IP]                                    # TCP SYN ping
@@ -93,7 +93,7 @@ nmap --min-parallelism 10 [IP]    # Min parallel probes
 ### Evading IDS/Firewall
 ```bash
 nmap -f [IP]                        # Packet fragmentation
-nmap -mtu 8 [IP]                    # Custom MTU (8 bytes)
+nmap -mtu 8 [IP]                    # Specifies the number of Maximum Transmission Unit (MTU) (here, 8 bytes of packets).
 nmap -g 80 [IP]                     # Source port manipulation
 nmap -D RND:10 [IP]                 # IP decoy (10 random decoys)
 nmap -sT -Pn --spoof-mac 0 [IP]     # Random MAC spoofing
