@@ -1127,12 +1127,6 @@ Lists all open TCP/IP and UDP ports with process information.
 ### Process Monitor (Process Monitoring)
 Shows real-time file system, registry, and process activity.
 
-**Location:**
-```
-Z:\CEHv13 Module 07 Malware Threats\Malware Analysis Tools\
-Dynamic Malware Analysis Tools\Process Monitoring Tools\ProcessMonitor\Procmon.exe
-```
-
 **Workflow:**
 1. Launch `Procmon.exe`
 2. Scroll to find suspicious process
@@ -1144,6 +1138,172 @@ Dynamic Malware Analysis Tools\Process Monitoring Tools\ProcessMonitor\Procmon.e
 | Event | Date, thread, class, operation, result, path |
 | Process | Complete process details |
 | Stack | Supported DLLs of the process |
+
+---
+
+### PE Explorer
+PE Explorer is a GUI tool for examining Windows Portable Executable (PE) files without executing them. Used in static malware analysis to inspect what a binary does before running it.
+
+#### Import Table (Most Important)
+Shows all external functions and DLLs the executable depends on.
+```
+View → Imports
+```
+- Left pane → DLLs loaded by the executable
+- Right pane → functions called from selected DLL. Clicking a DLL in left pane shows its imported functions on the right with RVA, Hint, and Name columns.
+- Bottom pane → syntax details of selected function. Shows full function signature and which DLL it comes from.
+
+| DLL | Purpose | Suspicious? |
+|-----|---------|-------------|
+| KERNEL32.dll | Core Windows OS functions | Normal |
+| WSOCK32.dll / WS2_32.dll | Network/socket functions | ⚠️ Context dependent |
+| WININET.dll | Internet functions | ⚠️ Yes |
+| ADVAPI32.dll | Registry, crypto, services | ⚠️ Context dependent |
+| USER32.dll | GUI functions | Normal |
+
+#### Export Table
+```
+View → Exports
+```
+
+#### Section Headers
+```
+View → Section Headers
+```
+| Section | Contents |
+|---------|----------|
+| .text | Executable code |
+| .data | Initialized data |
+| .rdata | Read-only data (strings, constants) |
+| .rsrc | Resources (icons, dialogs) |
+| .idata | Import table |
+| .edata | Export table |
+
+#### Resources
+```
+View → Resources
+```
+
+#### PE Header
+```
+View → PE Header
+```
+
+| Field | Red Flag | Normal |
+|-------|----------|--------|
+| Checksum | `00000000` (zeroed) | Non-zero value |
+| File size | Very small (< 10KB) | Varies by app |
+| PE Signature | Should always say OK | — |
+| Timestamp | Zeroed or very old | Recent compile date |
+
+Example from tini.exe:
+```
+PE Signature: OK
+Header Checksum: 00000000   ← SUSPICIOUS (zeroed)
+Real Checksum:  00005E95h   ← what it should be
+File Size:      3072 bytes  ← only 3KB — very small
+```
+
+#### Suspicious API Calls
+
+_Process Injection_
+| API Call | Why Suspicious |
+|----------|---------------|
+| `VirtualAlloc` | Allocates memory — used by shellcode |
+| `VirtualAllocEx` | Allocates memory in another process |
+| `WriteProcessMemory` | Writes to another process memory |
+| `CreateRemoteThread` | Creates thread in another process |
+| `OpenProcess` | Opens handle to another process |
+
+_Code Execution_
+| API Call | Why Suspicious |
+|----------|---------------|
+| `CreateProcessA` | Spawns a new process (e.g. cmd.exe) |
+| `WinExec` | Executes a program |
+| `ShellExecute` | Executes a program |
+| `LoadLibrary` | Loads a DLL dynamically |
+| `GetProcAddress` | Resolves function addresses at runtime |
+| `CreateThread` | Creates new thread — may hide execution |
+
+_Backdoor / Remote Shell Pattern_
+| API Call | Role in Backdoor |
+|----------|-----------------|
+| `WSOCK32.dll` | `WS2_32.dll` | Opens network socket |
+| `CreatePipe` | Creates input/output communication channel |
+| `CreateProcessA` | Spawns cmd.exe |
+| `ReadFile` | Reads commands from attacker |
+| `WriteFile` | Sends output back to attacker |
+| `CreateThread` | Runs shell in separate thread |
+
+This combination = classic remote shell/backdoor (e.g. tini.exe)
+
+_Persistence_
+| API Call | Why Suspicious |
+|----------|---------------|
+| `RegCreateKey` | Creates registry key |
+| `RegSetValue` | Modifies registry value |
+| `RegOpenKey` | Opens registry key |
+
+_Network / Download_
+| API Call | Why Suspicious |
+|----------|---------------|
+| `URLDownloadToFile` | Downloads file from internet |
+| `InternetOpen` | Opens internet connection |
+| `InternetConnect` | Connects to remote server |
+| `HttpSendRequest` | Sends HTTP request |
+| `WSAStartup` | Initializes network socket |
+| `connect` | Establishes network connection |
+
+_Credential / Data Theft_
+| API Call | Why Suspicious |
+|----------|---------------|
+| `ReadProcessMemory` | Reads another process memory |
+| `GetAsyncKeyState` | Captures keystrokes — keylogger |
+| `SetWindowsHookEx` | Hooks keyboard/mouse — keylogger |
+| `CryptEncrypt` | Encrypts data — ransomware |
+| `FindFirstFile` | Enumerates files — ransomware/exfil |
+
+#### Malware Type by API Combination
+| API Combination | Likely Malware Type |
+|----------------|-------------------|
+| VirtualAlloc + WriteProcessMemory + CreateRemoteThread | Process injection |
+| URLDownloadToFile + WinExec | Dropper/downloader |
+| RegCreateKey + RegSetValue | Persistence mechanism |
+| CryptEncrypt + FindFirstFile | Ransomware |
+| OpenProcess + ReadProcessMemory | Credential theft |
+| GetAsyncKeyState + SetWindowsHookEx | Keylogger |
+| WSAStartup + connect + send | Reverse shell / RAT |
+| WSOCK32 + CreatePipe + CreateProcessA + ReadFile + WriteFile | Remote shell backdoor |
+
+#### Comparing Normal vs Malicious Imports
+
+Normal notepad.exe imports (expected):
+```
+kernel32.dll  → CreateFile, ReadFile, WriteFile
+user32.dll    → CreateWindow, MessageBox
+gdi32.dll     → TextOut, BitBlt
+```
+
+Suspicious imports (red flags):
+```
+kernel32.dll  → VirtualAlloc, WriteProcessMemory
+kernel32.dll  → CreateRemoteThread, OpenProcess
+kernel32.dll  → CreateProcessA, CreateThread, CreatePipe
+wsock32.dll   → network functions (unexpected in simple utility)
+wininet.dll   → URLDownloadToFile, InternetConnect
+advapi32.dll  → RegCreateKey, RegSetValue
+```
+
+#### Key Notes
+| Item | Detail |
+|------|---------|
+| First thing to check | Import Table — reveals malicious intent |
+| Zeroed checksum | Strong indicator of malicious/modified file |
+| Very small file size | Simple backdoors often under 10KB |
+| WSOCK32/WS2_32 present | File uses network — investigate further |
+| No imports visible | File may be packed — use DIE to detect packer |
+| Many GetProcAddress calls | Dynamically resolving APIs to hide intent |
+| CEH exam focus | Identifying suspicious API calls from import table |
 
 ---
 
