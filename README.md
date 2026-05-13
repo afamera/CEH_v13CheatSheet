@@ -997,6 +997,156 @@ http || dns                                  # OR
 
 ---
 
+## Malware Tools & Analysis
+
+### njRAT
+
+#### Building the Payload
+
+1. Launch `njRAT v0.8d.exe`
+2. Accept default port (`5553`) → click **OK**
+3. Click **Build** (lower-left corner)
+4. In Builder dialog:
+   - **Host** → enter attacker IP
+   - Check **Randomize Stub** (optional)
+   - Check **USB Spread** (optional)
+   - Check **Protect Process [BSOD]** (optional)
+5. Click **Build**
+6. Save as `Test.exe` (or any innocent looking name)
+7. Click **OK** on success popup
+
+---
+
+### Hybrid Analysis (Online Scanner)
+**URL:** https://www.hybrid-analysis.com
+
+**Also try:**
+- https://app.any.run
+- https://valkyrie.comodo.com
+- https://www.joesandbox.com
+- https://virusscan.jotti.org
+
+---
+
+### Detect It Easy (DIE)
+Detects file type, compiler, linker, packer using signature-based detection.
+
+**Workflow:**
+1. Launch `die.exe`
+2. Click ellipsis → browse to target file
+3. Results show OS, compiler, language automatically
+
+**Key Buttons:**
+| Button | Shows |
+|--------|-------|
+| File Info | Filename, size, MD5, SHA1, entropy, entry points |
+| Hash | Hash values of file |
+| Entropy | Entropy status, size, graph |
+| MIME | File MIME type |
+| Hex | Hex view of file |
+
+**Key Note:** High entropy = likely packed/encrypted malware
+
+---
+
+### IDA (Disassembler)
+Converts binary executable to assembly language for analysis.
+
+**Workflow:**
+1. Launch IDA Freeware
+2. Click **New** → select malicious file
+3. Accept **Portable Executable for 80386 (PE)** option
+4. Review results in **IDA View-A** tab
+
+**Key Views:**
+| View/Tab | Shows |
+|----------|-------|
+| IDA View-A | Disassembled code (graph view) |
+| Text View | Right-click → Text view |
+| HexView-1 | Hex values of file |
+| Imports tab | All functions the executable calls |
+| View → Graphs → Flow Chart | Execution flow |
+| View → Graphs → Function Calls | Call flow diagram |
+
+**Suspicious Imports to Look For:**
+| API Call | Indicates |
+|----------|-----------|
+| VirtualAlloc | Memory allocation — shellcode |
+| WriteProcessMemory | Process injection |
+| CreateRemoteThread | Process injection |
+| URLDownloadToFile | Dropper/downloader |
+| RegCreateKey / RegSetValue | Persistence |
+| OpenProcess | Credential theft |
+| WinExec / ShellExecute | Code execution |
+
+---
+
+### OllyDbg (Debugger)
+Binary code debugger — useful when source code unavailable.
+
+**Workflow:**
+1. Launch `Ollydbg.exe`
+2. File → Open → select target executable
+3. Analyze output in **CPU - main thread** window
+
+**Key Views:**
+| View Menu Option | Shows |
+|-----------------|-------|
+| Log | Log data, entry point, function calls |
+| Executable Modules | All loaded modules |
+| Memory Map | All memory mappings |
+| Threads | All running threads |
+
+---
+
+### TCPView (Port Monitoring)
+Shows all active TCP/UDP connections and which process owns them.
+
+**Workflow:**
+1. Launch `tcpview.exe`
+2. Click **Local Port** tab to sort by port
+3. Look for suspicious processes
+4. Right-click suspicious process → **Kill Process**
+
+---
+
+### CurrPorts (Port Monitoring)
+Lists all open TCP/IP and UDP ports with process information.
+
+**Workflow:**
+1. Launch `cports.exe`
+2. Scroll to find suspicious process
+3. Right-click → **Properties** to view details
+4. Right-click → **Kill Processes of Selected Ports** to terminate
+5. Or right-click → **Close Selected TCP Connections** to block
+
+**Pink highlighted entries** = suspicious unidentified processes
+
+---
+
+### Process Monitor (Process Monitoring)
+Shows real-time file system, registry, and process activity.
+
+**Location:**
+```
+Z:\CEHv13 Module 07 Malware Threats\Malware Analysis Tools\
+Dynamic Malware Analysis Tools\Process Monitoring Tools\ProcessMonitor\Procmon.exe
+```
+
+**Workflow:**
+1. Launch `Procmon.exe`
+2. Scroll to find suspicious process
+3. Right-click → **Properties**
+
+**Properties Tabs:**
+| Tab | Shows |
+|-----|-------|
+| Event | Date, thread, class, operation, result, path |
+| Process | Complete process details |
+| Stack | Supported DLLs of the process |
+
+---
+
 ## Steganography & Cryptography Cheat Sheet
 
 ### SNOW / StegSnow (Whitespace Steganography)
