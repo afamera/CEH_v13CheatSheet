@@ -1,5 +1,5 @@
 # CEH v13 Practical Exam Cheat Sheet
-> Exam Date: May 15th, 2026
+> Exam Date: May, 2026
 
 ---
 
